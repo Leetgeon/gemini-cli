@@ -7,7 +7,6 @@
 import { vi, beforeEach, afterEach } from 'vitest';
 import { format } from 'node:util';
 import { coreEvents } from '@google/gemini-cli-core';
-import { themeManager, DEFAULT_THEME } from './src/ui/themes/theme-manager.js';
 
 // Unset CI environment variable so that ink renders dynamically as it does in a real terminal
 if (process.env.CI !== undefined) {
@@ -32,8 +31,13 @@ import './src/test-utils/customMatchers.js';
 let consoleErrorSpy: vi.SpyInstance;
 let actWarnings: Array<{ message: string; stack: string }> = [];
 
-beforeEach(() => {
+beforeEach(async () => {
   // Reset themeManager state to ensure test isolation
+  // We use dynamic import here to avoid importing themeManager at the top level,
+  // which can interfere with tests that need to mock its dependencies (like theme-manager.test.ts).
+  const { themeManager, DEFAULT_THEME } = await import(
+    './src/ui/themes/theme-manager.js'
+  );
   themeManager.loadCustomThemes({});
   themeManager.clearExtensionThemes();
   themeManager.clearFileThemes();
