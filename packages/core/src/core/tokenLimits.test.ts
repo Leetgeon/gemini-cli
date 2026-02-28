@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2026 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -26,10 +26,10 @@ describe('tokenLimit', () => {
     expect(tokenLimit(PREVIEW_GEMINI_FLASH_MODEL)).toBe(1_048_576);
   });
 
-  it('should return 1,000,000 for Claude models', () => {
+  it('should return the correct token limit for Claude models', () => {
     expect(tokenLimit('claude-opus-4-6')).toBe(1_000_000);
     expect(tokenLimit('claude-sonnet-4-20250514')).toBe(1_000_000);
-    expect(tokenLimit('claude-haiku-4-5')).toBe(1_000_000);
+    expect(tokenLimit('claude-haiku-4-5')).toBe(200_000);
   });
 
   it('should return the default token limit for an unknown model', () => {

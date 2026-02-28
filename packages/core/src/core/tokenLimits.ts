@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2026 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -29,6 +29,9 @@ export function tokenLimit(model: Model): TokenCount {
       return 1_048_576;
     default:
       if (model?.startsWith('claude-')) {
+        if (model.includes('haiku')) {
+          return 200_000;
+        }
         return 1_000_000;
       }
       return DEFAULT_TOKEN_LIMIT;

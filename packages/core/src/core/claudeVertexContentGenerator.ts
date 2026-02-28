@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2026 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -20,6 +20,7 @@ import type {
 import { GoogleAuth } from 'google-auth-library';
 import type { ContentGenerator } from './contentGenerator.js';
 import type { LlmRole } from '../telemetry/llmRole.js';
+import { debugLogger } from '../utils/debugLogger.js';
 import {
   convertGeminiRequestToClaude,
   convertClaudeResponseToGemini,
@@ -146,6 +147,11 @@ export class ClaudeVertexContentGenerator implements ContentGenerator {
     _request: CountTokensParameters,
   ): Promise<CountTokensResponse> {
     // Claude does not have a count tokens endpoint on Vertex AI.
+    // Downstream logic (e.g. context window management) should use estimates
+    // or rely on usage reports from generateContent responses.
+    debugLogger.warn(
+      'Token counting is not supported for Claude on Vertex AI. Returning 0 tokens.',
+    );
     return { totalTokens: 0 };
   }
 

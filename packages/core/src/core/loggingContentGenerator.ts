@@ -305,12 +305,11 @@ export class LoggingContentGenerator implements ContentGenerator {
     ) {
       const response = error.response as { data: unknown };
       const data = response.data;
-      if (typeof data === 'string' && data.includes(',')) {
+      // Stricter check for ASCII buffer strings (comma-separated integers)
+      if (typeof data === 'string' && /^\d+(,\d+)*$/.test(data)) {
         try {
           const charCodes = data.split(',').map(Number);
-          if (charCodes.every((code) => !isNaN(code))) {
-            response.data = String.fromCharCode(...charCodes);
-          }
+          response.data = charCodes.map((c) => String.fromCharCode(c)).join('');
         } catch (_e) {
           // If parsing fails, just leave it alone
         }

@@ -94,6 +94,8 @@ export type ContentGeneratorConfig = {
   vertexai?: boolean;
   authType?: AuthType;
   proxy?: string;
+  project?: string;
+  location?: string;
 };
 
 export async function createContentGeneratorConfig(
@@ -139,6 +141,8 @@ export async function createContentGeneratorConfig(
   ) {
     contentGeneratorConfig.apiKey = googleApiKey;
     contentGeneratorConfig.vertexai = true;
+    contentGeneratorConfig.project = googleCloudProject;
+    contentGeneratorConfig.location = googleCloudLocation;
 
     return contentGeneratorConfig;
   }
@@ -208,10 +212,14 @@ export async function createContentGenerator(
     ) {
       // Route Claude models to Vertex AI Claude endpoint
       if (isClaudeModel(model)) {
-        const project =
-          process.env['GOOGLE_CLOUD_PROJECT'] ||
-          process.env['GOOGLE_CLOUD_PROJECT_ID'];
-        const location = process.env['GOOGLE_CLOUD_LOCATION'];
+        if (config.authType === AuthType.USE_GEMINI) {
+          throw new Error(
+            'Claude models are only supported through Vertex AI. Please use Vertex AI authentication (set GOOGLE_GENAI_USE_VERTEXAI=true).',
+          );
+        }
+
+        const project = config.project;
+        const location = config.location;
 
         if (!project || !location) {
           throw new Error(

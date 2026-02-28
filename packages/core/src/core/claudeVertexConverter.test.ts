@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2026 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -438,6 +438,28 @@ describe('convertGeminiRequestToClaude', () => {
       const result = convertGeminiRequestToClaude(req, false);
       expect(result.tools![0].name).toHaveLength(128);
       expect(result.tools![0].name).toBe('a'.repeat(128));
+    });
+
+    it('should use fallback for empty tool names', () => {
+      const req: GenerateContentParameters = {
+        model: 'claude-opus-4-6',
+        contents: [{ role: 'user', parts: [{ text: 'Hi' }] }],
+        config: {
+          tools: [
+            {
+              functionDeclarations: [
+                {
+                  name: '',
+                  parameters: { type: Type.OBJECT, properties: {} },
+                },
+              ],
+            },
+          ],
+        },
+      };
+
+      const result = convertGeminiRequestToClaude(req, false);
+      expect(result.tools![0].name).toBe('unnamed_tool');
     });
   });
 });

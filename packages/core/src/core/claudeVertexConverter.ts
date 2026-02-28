@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2026 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -138,10 +138,20 @@ export function validateClaudeResponse(value: unknown): ClaudeResponse {
     !isRecord(value) ||
     typeof value['id'] !== 'string' ||
     !Array.isArray(value['content']) ||
-    !isRecord(value['usage'])
+    !isRecord(value['usage']) ||
+    typeof value['usage']['input_tokens'] !== 'number' ||
+    typeof value['usage']['output_tokens'] !== 'number'
   ) {
     throw new Error('Invalid Claude response structure');
   }
+
+  // Validate content block types
+  for (const block of value['content']) {
+    if (!isRecord(block) || typeof block['type'] !== 'string') {
+      throw new Error('Invalid Claude content block structure');
+    }
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated above
   return value as unknown as ClaudeResponse;
 }
@@ -339,8 +349,12 @@ function sanitizeToolName(name: string): string {
   // Replace any characters that are not alphanumeric, underscores, or hyphens with underscores
   const sanitized = name.replace(/[^a-zA-Z0-9_-]/g, '_');
   // Truncate to 128 characters if necessary
-  return sanitized.slice(0, 128);
+  const result = sanitized.slice(0, 128);
+  // Ensure it's not empty
+  return result || 'unnamed_tool';
 }
+
+let toolCallCounter = 0;
 
 function convertPartsToBlocks(
   parts: Part[],
@@ -352,7 +366,7 @@ function convertPartsToBlocks(
     if (part.functionCall) {
       blocks.push({
         type: 'tool_use',
-        id: part.functionCall.id || `call_${Date.now()}`,
+        id: part.functionCall.id || `call_${Date.now()}_${toolCallCounter++}`,
         name: sanitizeToolName(part.functionCall.name || ''),
         input: part.functionCall.args ?? {},
       });
@@ -692,7 +706,13 @@ function parseSSEEvent(raw: string): ClaudeStreamEvent | null {
     if (line.startsWith('event: ')) {
       eventType = line.slice(7).trim();
     } else if (line.startsWith('data: ')) {
-      data = line.slice(6);
+      // Per the SSE spec, data can span multiple lines.
+      // Append if it's not the first data line.
+      if (data) {
+        data += '\n' + line.slice(6);
+      } else {
+        data = line.slice(6);
+      }
     }
   }
 

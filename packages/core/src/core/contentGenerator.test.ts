@@ -456,12 +456,31 @@ describe('createContentGenerator', () => {
       {
         authType: AuthType.USE_VERTEX_AI,
         vertexai: true,
+        project: 'my-project',
+        location: 'us-east5',
       },
       mockConfig,
     );
     expect(generator).toBeInstanceOf(LoggingContentGenerator);
     // GoogleGenAI should NOT have been called for Claude models
     expect(GoogleGenAI).not.toHaveBeenCalled();
+  });
+
+  it('should throw when Claude model is used with AuthType.USE_GEMINI', async () => {
+    const mockConfig = {
+      getModel: vi.fn().mockReturnValue('claude-opus-4-6'),
+      getProxy: vi.fn().mockReturnValue(undefined),
+      getUsageStatisticsEnabled: () => false,
+    } as unknown as Config;
+
+    await expect(
+      createContentGenerator(
+        {
+          authType: AuthType.USE_GEMINI,
+        },
+        mockConfig,
+      ),
+    ).rejects.toThrow('Claude models are only supported through Vertex AI');
   });
 
   it('should throw when Claude model is used without GOOGLE_CLOUD_PROJECT', async () => {
@@ -472,7 +491,6 @@ describe('createContentGenerator', () => {
     } as unknown as Config;
 
     vi.stubEnv('GOOGLE_CLOUD_PROJECT', '');
-    vi.stubEnv('GOOGLE_CLOUD_PROJECT_ID', '');
     vi.stubEnv('GOOGLE_CLOUD_LOCATION', 'us-east5');
 
     await expect(
@@ -480,6 +498,8 @@ describe('createContentGenerator', () => {
         {
           authType: AuthType.USE_VERTEX_AI,
           vertexai: true,
+          project: '',
+          location: 'us-east5',
         },
         mockConfig,
       ),
@@ -503,6 +523,8 @@ describe('createContentGenerator', () => {
         {
           authType: AuthType.USE_VERTEX_AI,
           vertexai: true,
+          project: 'my-project',
+          location: '',
         },
         mockConfig,
       ),

@@ -314,6 +314,29 @@ describe('LoggingContentGenerator', () => {
           return true;
         });
       });
+
+      it('should NOT parse regular strings containing commas', async () => {
+        const req = { contents: [], model: 'gemini-pro' };
+
+        const commaString = 'Rate limit exceeded, try again later';
+        const gaxiosError = Object.assign(new Error('Gaxios Error'), {
+          response: { data: commaString },
+        });
+
+        vi.mocked(wrapped.generateContent).mockRejectedValue(gaxiosError);
+
+        await expect(
+          loggingContentGenerator.generateContent(
+            req,
+            'prompt-123',
+            LlmRole.MAIN,
+          ),
+        ).rejects.toSatisfy((error: unknown) => {
+          const gError = error as { response: { data: unknown } };
+          expect(gError.response.data).toBe(commaString);
+          return true;
+        });
+      });
     });
   });
 
