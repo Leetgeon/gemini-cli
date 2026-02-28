@@ -32,6 +32,11 @@ You can also use the `--model` flag to specify a particular Gemini model on
 startup. For more details, refer to the
 [configuration documentation](../reference/configuration.md).
 
+> **Tip:** Gemini CLI also supports Claude models on Vertex AI. Use
+> `--model claude-opus-4-6` (or another Claude model name) with Vertex AI
+> authentication. For setup instructions, see
+> [Claude models on Vertex AI](./claude-on-vertex.md).
+
 Changes to these settings will be applied to all subsequent interactions with
 Gemini CLI.
 

@@ -442,6 +442,75 @@ describe('createContentGenerator', () => {
     );
   });
 
+  it('should create a ClaudeVertexContentGenerator for Claude models with Vertex AI', async () => {
+    const mockConfig = {
+      getModel: vi.fn().mockReturnValue('claude-opus-4-6'),
+      getProxy: vi.fn().mockReturnValue(undefined),
+      getUsageStatisticsEnabled: () => false,
+    } as unknown as Config;
+
+    vi.stubEnv('GOOGLE_CLOUD_PROJECT', 'my-project');
+    vi.stubEnv('GOOGLE_CLOUD_LOCATION', 'us-east5');
+
+    const generator = await createContentGenerator(
+      {
+        authType: AuthType.USE_VERTEX_AI,
+        vertexai: true,
+      },
+      mockConfig,
+    );
+    expect(generator).toBeInstanceOf(LoggingContentGenerator);
+    // GoogleGenAI should NOT have been called for Claude models
+    expect(GoogleGenAI).not.toHaveBeenCalled();
+  });
+
+  it('should throw when Claude model is used without GOOGLE_CLOUD_PROJECT', async () => {
+    const mockConfig = {
+      getModel: vi.fn().mockReturnValue('claude-opus-4-6'),
+      getProxy: vi.fn().mockReturnValue(undefined),
+      getUsageStatisticsEnabled: () => false,
+    } as unknown as Config;
+
+    vi.stubEnv('GOOGLE_CLOUD_PROJECT', '');
+    vi.stubEnv('GOOGLE_CLOUD_PROJECT_ID', '');
+    vi.stubEnv('GOOGLE_CLOUD_LOCATION', 'us-east5');
+
+    await expect(
+      createContentGenerator(
+        {
+          authType: AuthType.USE_VERTEX_AI,
+          vertexai: true,
+        },
+        mockConfig,
+      ),
+    ).rejects.toThrow(
+      'Claude models require GOOGLE_CLOUD_PROJECT and GOOGLE_CLOUD_LOCATION',
+    );
+  });
+
+  it('should throw when Claude model is used without GOOGLE_CLOUD_LOCATION', async () => {
+    const mockConfig = {
+      getModel: vi.fn().mockReturnValue('claude-opus-4-6'),
+      getProxy: vi.fn().mockReturnValue(undefined),
+      getUsageStatisticsEnabled: () => false,
+    } as unknown as Config;
+
+    vi.stubEnv('GOOGLE_CLOUD_PROJECT', 'my-project');
+    vi.stubEnv('GOOGLE_CLOUD_LOCATION', '');
+
+    await expect(
+      createContentGenerator(
+        {
+          authType: AuthType.USE_VERTEX_AI,
+          vertexai: true,
+        },
+        mockConfig,
+      ),
+    ).rejects.toThrow(
+      'Claude models require GOOGLE_CLOUD_PROJECT and GOOGLE_CLOUD_LOCATION',
+    );
+  });
+
   it('should pass apiVersion for Vertex AI when GOOGLE_GENAI_API_VERSION is set', async () => {
     const mockConfig = {
       getModel: vi.fn().mockReturnValue('gemini-pro'),

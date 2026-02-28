@@ -183,6 +183,17 @@ export function isCustomModel(model: string): boolean {
 }
 
 /**
+ * Checks if the model is a Claude model hosted on Vertex AI.
+ *
+ * @param model The model name to check.
+ * @returns True if the model is a Claude model.
+ */
+export function isClaudeModel(model: string): boolean {
+  const resolved = resolveModel(model);
+  return resolved.startsWith('claude-');
+}
+
+/**
  * Checks if the model should be treated as a modern model.
  * This includes Gemini 3 models and any custom models.
  *

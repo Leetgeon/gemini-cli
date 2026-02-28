@@ -26,6 +26,12 @@ describe('tokenLimit', () => {
     expect(tokenLimit(PREVIEW_GEMINI_FLASH_MODEL)).toBe(1_048_576);
   });
 
+  it('should return 1,000,000 for Claude models', () => {
+    expect(tokenLimit('claude-opus-4-6')).toBe(1_000_000);
+    expect(tokenLimit('claude-sonnet-4-20250514')).toBe(1_000_000);
+    expect(tokenLimit('claude-haiku-4-5')).toBe(1_000_000);
+  });
+
   it('should return the default token limit for an unknown model', () => {
     expect(tokenLimit('unknown-model')).toBe(DEFAULT_TOKEN_LIMIT);
   });

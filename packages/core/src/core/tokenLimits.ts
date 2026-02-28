@@ -28,6 +28,9 @@ export function tokenLimit(model: Model): TokenCount {
     case DEFAULT_GEMINI_FLASH_LITE_MODEL:
       return 1_048_576;
     default:
+      if (model?.startsWith('claude-')) {
+        return 1_000_000;
+      }
       return DEFAULT_TOKEN_LIMIT;
   }
 }

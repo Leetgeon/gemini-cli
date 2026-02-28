@@ -23,8 +23,9 @@ import { InstallationManager } from '../utils/installationManager.js';
 import { FakeContentGenerator } from './fakeContentGenerator.js';
 import { parseCustomHeaders } from '../utils/customHeaderUtils.js';
 import { RecordingContentGenerator } from './recordingContentGenerator.js';
-import { getVersion, resolveModel } from '../../index.js';
+import { getVersion, resolveModel, isClaudeModel } from '../../index.js';
 import type { LlmRole } from '../telemetry/llmRole.js';
+import { ClaudeVertexContentGenerator } from './claudeVertexContentGenerator.js';
 
 /**
  * Interface abstracting the core functionalities for generating content and counting tokens.
@@ -205,6 +206,25 @@ export async function createContentGenerator(
       config.authType === AuthType.USE_GEMINI ||
       config.authType === AuthType.USE_VERTEX_AI
     ) {
+      // Route Claude models to Vertex AI Claude endpoint
+      if (isClaudeModel(model)) {
+        const project =
+          process.env['GOOGLE_CLOUD_PROJECT'] ||
+          process.env['GOOGLE_CLOUD_PROJECT_ID'];
+        const location = process.env['GOOGLE_CLOUD_LOCATION'];
+
+        if (!project || !location) {
+          throw new Error(
+            'Claude models require GOOGLE_CLOUD_PROJECT and GOOGLE_CLOUD_LOCATION environment variables to be set for Vertex AI.',
+          );
+        }
+
+        return new LoggingContentGenerator(
+          new ClaudeVertexContentGenerator(project, location),
+          gcConfig,
+        );
+      }
+
       let headers: Record<string, string> = { ...baseHeaders };
       if (gcConfig?.getUsageStatisticsEnabled()) {
         const installationManager = new InstallationManager();

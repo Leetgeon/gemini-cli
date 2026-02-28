@@ -110,7 +110,13 @@ To authenticate and use Gemini CLI with a Gemini API key:
 ## Use Vertex AI <a id="vertex-ai"></a>
 
 To use Gemini CLI with Google Cloud's Vertex AI platform, choose from the
-following authentication options:
+following authentication options.
+
+> **Tip:** Vertex AI also supports Claude models (such as `claude-opus-4-6`)
+> through the Vertex AI Model Garden. For setup instructions, see
+> [Claude models on Vertex AI](../cli/claude-on-vertex.md).
+
+Choose from the following authentication options:
 
 - A. Application Default Credentials (ADC) using `gcloud`.
 - B. Service account JSON key.

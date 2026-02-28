@@ -98,6 +98,10 @@
           { "label": "IDE integration", "slug": "docs/ide-integration" },
           { "label": "MCP servers", "slug": "docs/tools/mcp-server" },
           { "label": "Model routing", "slug": "docs/cli/model-routing" },
+          {
+            "label": "Claude on Vertex AI",
+            "slug": "docs/cli/claude-on-vertex"
+          },
           { "label": "Model selection", "slug": "docs/cli/model" },
           { "label": "Plan mode", "badge": "🔬", "slug": "docs/cli/plan-mode" },
           {

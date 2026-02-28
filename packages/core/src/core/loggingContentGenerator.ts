@@ -32,6 +32,7 @@ import {
 } from '../telemetry/loggers.js';
 import type { ContentGenerator } from './contentGenerator.js';
 import { CodeAssistServer } from '../code_assist/server.js';
+import { ClaudeVertexContentGenerator } from './claudeVertexContentGenerator.js';
 import { toContents } from '../code_assist/converter.js';
 import { isStructuredError } from '../utils/quotaErrorDetection.js';
 import { runInDevTraceSpan, type SpanMetadata } from '../telemetry/trace.js';
@@ -196,6 +197,19 @@ export class LoggingContentGenerator implements ContentGenerator {
     req: GenerateContentParameters,
     method: 'generateContent' | 'generateContentStream',
   ): ServerDetails {
+    // Case 0: Claude models on Vertex AI via direct API calls.
+    if (this.wrapped instanceof ClaudeVertexContentGenerator) {
+      const location = process.env['GOOGLE_CLOUD_LOCATION'];
+      if (location) {
+        const address =
+          location === 'global'
+            ? 'aiplatform.googleapis.com'
+            : `${location}-aiplatform.googleapis.com`;
+        return { address, port: 443 };
+      }
+      return { address: 'unknown', port: 0 };
+    }
+
     // Case 1: Authenticated with a Google account (`gcloud auth login`).
     // Requests are routed through the internal CodeAssistServer.
     if (this.wrapped instanceof CodeAssistServer) {
@@ -214,7 +228,11 @@ export class LoggingContentGenerator implements ContentGenerator {
     if (genConfig?.vertexai) {
       const location = process.env['GOOGLE_CLOUD_LOCATION'];
       if (location) {
-        return { address: `${location}-aiplatform.googleapis.com`, port: 443 };
+        const address =
+          location === 'global'
+            ? 'aiplatform.googleapis.com'
+            : `${location}-aiplatform.googleapis.com`;
+        return { address, port: 443 };
       } else {
         return { address: 'unknown', port: 0 };
       }

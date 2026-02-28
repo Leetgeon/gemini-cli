@@ -11,6 +11,7 @@ import {
   isGemini3Model,
   isGemini2Model,
   isCustomModel,
+  isClaudeModel,
   supportsModernFeatures,
   isAutoModel,
   getDisplayString,
@@ -309,6 +310,30 @@ describe('resolveClassifierModel', () => {
         true,
       ),
     ).toBe(PREVIEW_GEMINI_3_1_CUSTOM_TOOLS_MODEL);
+  });
+});
+
+describe('isClaudeModel', () => {
+  it('should return true for Claude model names', () => {
+    expect(isClaudeModel('claude-opus-4-6')).toBe(true);
+    expect(isClaudeModel('claude-sonnet-4-20250514')).toBe(true);
+    expect(isClaudeModel('claude-haiku-4-5')).toBe(true);
+    expect(isClaudeModel('claude-3-opus')).toBe(true);
+  });
+
+  it('should return false for Gemini models', () => {
+    expect(isClaudeModel('gemini-2.5-pro')).toBe(false);
+    expect(isClaudeModel('gemini-3-pro-preview')).toBe(false);
+  });
+
+  it('should return false for aliases that resolve to Gemini models', () => {
+    expect(isClaudeModel(GEMINI_MODEL_ALIAS_AUTO)).toBe(false);
+    expect(isClaudeModel(GEMINI_MODEL_ALIAS_PRO)).toBe(false);
+  });
+
+  it('should return false for other custom models', () => {
+    expect(isClaudeModel('gpt-4')).toBe(false);
+    expect(isClaudeModel('some-model')).toBe(false);
   });
 });
 
