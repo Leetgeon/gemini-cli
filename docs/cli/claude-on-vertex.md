@@ -63,6 +63,9 @@ gemini --model claude-opus-4-6
 
 When prompted, select **Vertex AI** as the authentication method.
 
+> **Note for developers:** Test with
+> `npm run build && npm run start -- --model claude-opus-4-6`.
+
 ### Switching models in-session
 
 If you have already configured Vertex AI authentication, you can switch to a
