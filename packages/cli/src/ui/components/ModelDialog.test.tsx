@@ -20,6 +20,9 @@ import {
   PREVIEW_GEMINI_3_1_CUSTOM_TOOLS_MODEL,
   PREVIEW_GEMINI_FLASH_MODEL,
   AuthType,
+  CLAUDE_OPUS_4_6,
+  CLAUDE_SONNET_4_6,
+  CLAUDE_HAIKU_4_5,
 } from '@google/gemini-cli-core';
 import type { Config, ModelSlashCommandEvent } from '@google/gemini-cli-core';
 
@@ -40,6 +43,9 @@ vi.mock('@google/gemini-cli-core', async () => {
         mockModelSlashCommandEvent(model);
       }
     },
+    CLAUDE_OPUS_4_6: 'claude-opus-4-6',
+    CLAUDE_SONNET_4_6: 'claude-sonnet-4-6',
+    CLAUDE_HAIKU_4_5: 'claude-haiku-4-5',
   };
 });
 
@@ -366,6 +372,70 @@ describe('<ModelDialog />', () => {
           PREVIEW_GEMINI_3_1_CUSTOM_TOOLS_MODEL,
           true,
         );
+      });
+      unmount();
+    });
+  });
+
+  describe('Claude Models', () => {
+    it('shows Claude models in manual view when Vertex AI is selected', async () => {
+      mockGetDisplayString.mockImplementation((val: string) => {
+        if (val === CLAUDE_OPUS_4_6) return 'Claude Opus 4.6';
+        if (val === CLAUDE_SONNET_4_6) return 'Claude Sonnet 4.6';
+        if (val === CLAUDE_HAIKU_4_5) return 'Claude Haiku 4.5';
+        return val;
+      });
+
+      const { lastFrame, stdin, waitUntilReady, unmount } =
+        await renderComponent(mockConfig as Config, AuthType.USE_VERTEX_AI);
+
+      // Select "Manual" (index 1)
+      await act(async () => {
+        stdin.write('\u001B[B'); // Arrow Down
+      });
+      await waitUntilReady();
+
+      // Press enter to select
+      await act(async () => {
+        stdin.write('\r');
+      });
+      await waitUntilReady();
+
+      // Should now show manual options including Claude models
+      await waitFor(() => {
+        const output = lastFrame();
+        expect(output).toContain('Claude Opus 4.6');
+        expect(output).toContain('Claude Sonnet 4.6');
+        expect(output).toContain('Claude Haiku 4.5');
+      });
+      unmount();
+    });
+
+    it('does NOT show Claude models in manual view when Vertex AI is NOT selected', async () => {
+      mockGetDisplayString.mockImplementation((val: string) => {
+        if (val === CLAUDE_OPUS_4_6) return 'Claude Opus 4.6';
+        return val;
+      });
+
+      const { lastFrame, stdin, waitUntilReady, unmount } =
+        await renderComponent(mockConfig as Config, AuthType.LOGIN_WITH_GOOGLE);
+
+      // Select "Manual" (index 1)
+      await act(async () => {
+        stdin.write('\u001B[B'); // Arrow Down
+      });
+      await waitUntilReady();
+
+      // Press enter to select
+      await act(async () => {
+        stdin.write('\r');
+      });
+      await waitUntilReady();
+
+      // Should NOT show Claude models
+      await waitFor(() => {
+        const output = lastFrame();
+        expect(output).not.toContain('Claude 3 Opus');
       });
       unmount();
     });

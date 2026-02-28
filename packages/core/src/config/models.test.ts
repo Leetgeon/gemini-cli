@@ -31,6 +31,9 @@ import {
   PREVIEW_GEMINI_3_1_CUSTOM_TOOLS_MODEL,
   isPreviewModel,
   isProModel,
+  CLAUDE_OPUS_4_6,
+  CLAUDE_SONNET_4_6,
+  CLAUDE_HAIKU_4_5,
 } from './models.js';
 
 describe('isPreviewModel', () => {
@@ -154,6 +157,12 @@ describe('getDisplayString', () => {
     expect(getDisplayString(PREVIEW_GEMINI_3_1_CUSTOM_TOOLS_MODEL)).toBe(
       PREVIEW_GEMINI_3_1_MODEL,
     );
+  });
+
+  it('should return friendly names for Claude models', () => {
+    expect(getDisplayString(CLAUDE_OPUS_4_6)).toBe('Claude Opus 4.6');
+    expect(getDisplayString(CLAUDE_SONNET_4_6)).toBe('Claude Sonnet 4.6');
+    expect(getDisplayString(CLAUDE_HAIKU_4_5)).toBe('Claude Haiku 4.5');
   });
 
   it('should return the model name as is for other models', () => {
@@ -342,6 +351,9 @@ describe('isActiveModel', () => {
     expect(isActiveModel(DEFAULT_GEMINI_MODEL)).toBe(true);
     expect(isActiveModel(PREVIEW_GEMINI_MODEL)).toBe(true);
     expect(isActiveModel(DEFAULT_GEMINI_FLASH_MODEL)).toBe(true);
+    expect(isActiveModel(CLAUDE_OPUS_4_6)).toBe(true);
+    expect(isActiveModel(CLAUDE_SONNET_4_6)).toBe(true);
+    expect(isActiveModel(CLAUDE_HAIKU_4_5)).toBe(true);
   });
 
   it('should return true for unknown models and aliases', () => {

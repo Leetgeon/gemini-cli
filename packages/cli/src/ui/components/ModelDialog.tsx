@@ -21,6 +21,9 @@ import {
   getDisplayString,
   AuthType,
   PREVIEW_GEMINI_3_1_CUSTOM_TOOLS_MODEL,
+  CLAUDE_OPUS_4_6,
+  CLAUDE_SONNET_4_6,
+  CLAUDE_HAIKU_4_5,
 } from '@google/gemini-cli-core';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { theme } from '../semantic-colors.js';
@@ -56,6 +59,9 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
       PREVIEW_GEMINI_3_1_MODEL,
       PREVIEW_GEMINI_3_1_CUSTOM_TOOLS_MODEL,
       PREVIEW_GEMINI_FLASH_MODEL,
+      CLAUDE_OPUS_4_6,
+      CLAUDE_SONNET_4_6,
+      CLAUDE_HAIKU_4_5,
     ];
     if (manualModels.includes(preferredModel)) {
       return preferredModel;
@@ -155,8 +161,34 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
         },
       );
     }
+
+    if (selectedAuthType === AuthType.USE_VERTEX_AI) {
+      list.push(
+        {
+          value: CLAUDE_OPUS_4_6,
+          title: getDisplayString(CLAUDE_OPUS_4_6),
+          key: CLAUDE_OPUS_4_6,
+        },
+        {
+          value: CLAUDE_SONNET_4_6,
+          title: getDisplayString(CLAUDE_SONNET_4_6),
+          key: CLAUDE_SONNET_4_6,
+        },
+        {
+          value: CLAUDE_HAIKU_4_5,
+          title: getDisplayString(CLAUDE_HAIKU_4_5),
+          key: CLAUDE_HAIKU_4_5,
+        },
+      );
+    }
+
     return list;
-  }, [shouldShowPreviewModels, useGemini31, useCustomToolModel]);
+  }, [
+    shouldShowPreviewModels,
+    useGemini31,
+    useCustomToolModel,
+    selectedAuthType,
+  ]);
 
   const options = view === 'main' ? mainOptions : manualOptions;
 

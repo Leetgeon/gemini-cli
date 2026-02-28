@@ -63,6 +63,18 @@ gemini --model claude-opus-4-6
 
 When prompted, select **Vertex AI** as the authentication method.
 
+### Switching models in-session
+
+If you have already configured Vertex AI authentication, you can switch to a
+Claude model during a session:
+
+1. Type `/model` and press Enter to open the model selection dialog.
+2. Navigate to **Manual**.
+3. Select the desired Claude model from the list.
+
+> **Note:** Claude models only appear in the manual selection list when **Vertex
+> AI** is the active authentication method.
+
 ## Supported models
 
 You can use any Claude model available on Vertex AI. Specify the model name with

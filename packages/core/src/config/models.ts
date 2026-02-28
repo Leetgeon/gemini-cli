@@ -13,6 +13,10 @@ export const DEFAULT_GEMINI_MODEL = 'gemini-2.5-pro';
 export const DEFAULT_GEMINI_FLASH_MODEL = 'gemini-2.5-flash';
 export const DEFAULT_GEMINI_FLASH_LITE_MODEL = 'gemini-2.5-flash-lite';
 
+export const CLAUDE_OPUS_4_6 = 'claude-opus-4-6';
+export const CLAUDE_SONNET_4_6 = 'claude-sonnet-4-6';
+export const CLAUDE_HAIKU_4_5 = 'claude-haiku-4-5';
+
 export const VALID_GEMINI_MODELS = new Set([
   PREVIEW_GEMINI_MODEL,
   PREVIEW_GEMINI_3_1_MODEL,
@@ -21,6 +25,9 @@ export const VALID_GEMINI_MODELS = new Set([
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
+  CLAUDE_OPUS_4_6,
+  CLAUDE_SONNET_4_6,
+  CLAUDE_HAIKU_4_5,
 ]);
 
 export const PREVIEW_GEMINI_MODEL_AUTO = 'auto-gemini-3';
@@ -119,6 +126,12 @@ export function getDisplayString(model: string) {
       return PREVIEW_GEMINI_FLASH_MODEL;
     case PREVIEW_GEMINI_3_1_CUSTOM_TOOLS_MODEL:
       return PREVIEW_GEMINI_3_1_MODEL;
+    case CLAUDE_OPUS_4_6:
+      return 'Claude Opus 4.6';
+    case CLAUDE_SONNET_4_6:
+      return 'Claude Sonnet 4.6';
+    case CLAUDE_HAIKU_4_5:
+      return 'Claude Haiku 4.5';
     default:
       return model;
   }
